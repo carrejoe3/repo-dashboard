@@ -11,9 +11,15 @@ struct SbomResponse {
 
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let cors = warp::cors()
+        .allow_any_origin()
+        .allow_method("GET")
+        .allow_header("content-type");
+
     let sbom_route = warp::path("sbom")
         .and(warp::get())
-        .and_then(handle_fetch_sbom);
+        .and_then(handle_fetch_sbom)
+        .with(cors);
 
     warp::serve(sbom_route)
         .run(([127, 0, 0, 1], 3030))
