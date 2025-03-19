@@ -1,11 +1,29 @@
-mod requests;
+mod handle_response;
 
-use requests::fetch_sbom;
+use reqwest::Error;
+use handle_response::process_success_response;
 
 #[tokio::main]
-pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let json_data = fetch_sbom().await?;
-    println!("{:?}", json_data);
+async fn main() -> Result<(), Error> {
+    let owner = "facebook";
+    let repo = "react";
+    let url = format!(
+        "https://raw.githubusercontent.com/{}/{}/main/package.json",
+        owner, repo
+    );
+
+    println!("Fetching package.json from: {}", url);
+
+    let response = reqwest::get(&url).await?;
+
+    if response.status().is_success() {
+        process_success_response(response).await?;
+    } else {
+        println!(
+            "Failed to fetch package.json from target repo: HTTP {}",
+            response.status()
+        );
+    }
 
     Ok(())
 }
