@@ -1,16 +1,5 @@
 <!doctype html>
 <html lang="en">
-    <body>
-        <div id="main"></div>
-    </body>
-    <script>
-        const response = window.fetch('http://localhost:3030/sbom')
-            .then(response => response.json())
-            .then(data => {
-                window.document.getElementById('main').innerText = JSON.stringify(data, null, 2);
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    </script>
+    <head></head>
+    <body></body>
 </html>

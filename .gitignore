@@ -17,4 +17,3 @@ target/
 #.idea/
 /dist
 /client/dist
-.DS_Store
