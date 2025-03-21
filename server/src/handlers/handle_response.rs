@@ -1,29 +1,5 @@
+use crate::handlers::types::PackageJson;
 use reqwest::Error;
-use serde::Deserialize;
-use serde::Serialize;
-use std::collections::HashMap;
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Repository {
-    r#type: Option<String>,
-    url: Option<String>,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct PackageJson {
-    name: Option<String>,
-    version: Option<String>,
-    description: Option<String>,
-    main: Option<String>,
-    scripts: Option<HashMap<String, String>>,
-    dependencies: Option<HashMap<String, String>>,
-    devDependencies: Option<HashMap<String, String>>,
-    peerDependencies: Option<HashMap<String, String>>,
-    optionalDependencies: Option<HashMap<String, String>>,
-    author: Option<String>,
-    license: Option<String>,
-    repository: Option<Repository>,
-}
 
 pub async fn process_success_response(response: reqwest::Response) -> Result<PackageJson, Error> {
     let package_json: PackageJson = response.json().await?;

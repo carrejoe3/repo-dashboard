@@ -1,4 +1,4 @@
-use crate::request_handlers::handle_response::process_success_response;
+use crate::handlers::handle_response::process_success_response;
 
 pub async fn fetch_package_json(
     owner: String,

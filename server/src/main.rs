@@ -1,6 +1,6 @@
-mod request_handlers;
+mod handlers;
 
-use request_handlers::requests::fetch_package_json;
+use handlers::requests::fetch_package_json;
 use reqwest::Error;
 use warp::Filter;
 
