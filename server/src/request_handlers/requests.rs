@@ -16,11 +16,11 @@ pub async fn fetch_package_json(
         .map_err(|_| warp::reject::not_found())?;
 
     if response.status().is_success() {
-        process_success_response(response)
+        let processed_response = process_success_response(response)
             .await
             .map_err(|_| warp::reject::not_found())?;
         Ok(warp::reply::with_status(
-            "Success",
+            warp::reply::json(&processed_response),
             warp::http::StatusCode::OK,
         ))
     } else {
@@ -29,7 +29,7 @@ pub async fn fetch_package_json(
             response.status()
         );
         Ok(warp::reply::with_status(
-            "Failed to fetch package.json",
+            warp::reply::json(&"Failed to fetch package.json"),
             warp::http::StatusCode::BAD_REQUEST,
         ))
     }
