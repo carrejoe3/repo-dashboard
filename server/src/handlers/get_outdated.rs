@@ -24,6 +24,7 @@ pub async fn run_npm_outdated(
     // Run the `npm outdated` command
     let output = Command::new("npm")
         .arg("outdated")
+        .arg("--json")
         .current_dir(".") // Ensure the command runs in the correct directory
         .output()
         .await?;
