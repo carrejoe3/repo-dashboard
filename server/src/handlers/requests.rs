@@ -1,5 +1,4 @@
 use crate::handlers::handle_response::process_success_response;
-use crate::handlers::types::PackageJson;
 
 pub async fn fetch_package_json(
     owner: String,
