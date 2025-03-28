@@ -18,3 +18,5 @@ target/
 /dist
 /client/dist
 server/package.json
+/client/node_modules
+.DS_Store
