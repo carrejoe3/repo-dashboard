@@ -2,15 +2,19 @@ import { useState } from 'react'
 import './App.css'
 
 function App() {
-  const [owner, setOwner] = useState('')
-  const [repoName, setRepoName] = useState('')
+  const [owner, setOwner] = useState('carrejoe3')
+  const [repoName, setRepoName] = useState('wedding-site')
+  const [buttonDisabled, setButtonDisabled] = useState(false)
 
   const fetchRepoData = async () => {
     try {
+      setButtonDisabled(true);
+
       const response = await fetch(`http://localhost:3030/outdated/${owner}/${repoName}`);
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
+
       const data = await response.json();
       console.log('Repo data:', data);
     } catch (error) {
@@ -42,7 +46,12 @@ function App() {
         />
       </div>
       <div className='p-3 pt-5 w-full'>
-        <button onClick={() => fetchRepoData()} className='shadow-sm'>Search</button>
+        <button
+          onClick={() => fetchRepoData()}
+          className='shadow-sm'
+          disabled={buttonDisabled || owner === '' || repoName === ''}>
+          Search
+        </button>
       </div>
     </div>
   )
