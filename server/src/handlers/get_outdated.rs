@@ -37,7 +37,11 @@ pub async fn run_npm_outdated(
     // Handle the output
     if output.status.success() || output.status.code() == Some(1) {
         // Treat exit status 1 as a valid result (outdated dependencies found)
-        Ok(stdout.to_string())
+        if stdout.trim().is_empty() {
+            Ok("All dependencies are up to date!".to_string())
+        } else {
+            Ok(stdout.to_string())
+        }
     } else {
         // Treat other non-zero exit codes as errors
         Err(format!("npm outdated failed: {}", stderr).into())
