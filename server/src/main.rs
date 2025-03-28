@@ -4,10 +4,15 @@ use handlers::errors::CustomError;
 use handlers::get_outdated::run_npm_outdated;
 use handlers::requests::fetch_package_json;
 use reqwest::Error;
-use warp::Filter;
+use warp::{http::Method, Filter};
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    let cors = warp::cors()
+        .allow_any_origin()
+        .allow_methods(&[Method::GET, Method::POST])
+        .allow_headers(vec!["content-type"]);
+
     let fetch_outdated_route =
         warp::path!("outdated" / String / String).and_then(|owner, repo| async move {
             match fetch_package_json(owner, repo).await {
@@ -21,7 +26,9 @@ async fn main() -> Result<(), Error> {
             }
         });
 
-    warp::serve(fetch_outdated_route)
+    let routes = fetch_outdated_route.with(cors);
+
+    warp::serve(routes)
         .run(([127, 0, 0, 1], 3030))
         .await;
 
