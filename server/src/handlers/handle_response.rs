@@ -5,7 +5,6 @@ pub async fn process_success_response(response: reqwest::Response) -> Result<Pac
     let package_json: PackageJson = response.json().await?;
 
     println!("Package.json successfully fetched!");
-    println!("{:?}", package_json);
 
     Ok(package_json)
 }

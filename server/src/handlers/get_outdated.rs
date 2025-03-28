@@ -13,7 +13,7 @@ pub async fn run_npm_outdated(
     let package_json_str = serde_json::to_string(&package_json)?;
 
     // Write the JSON to a temporary package.json file
-    let temp_file_path = Path::new("temp_package.json");
+    let temp_file_path = Path::new("package.json");
     let mut temp_file = File::create(&temp_file_path)?;
     temp_file.write_all(package_json_str.as_bytes())?;
 
