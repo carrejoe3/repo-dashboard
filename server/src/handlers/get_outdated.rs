@@ -10,7 +10,11 @@ pub async fn run_npm_outdated(
     package_json: PackageJson,
 ) -> Result<String, Box<dyn std::error::Error>> {
     // Serialize the PackageJson struct to a JSON string
-    let package_json_str = serde_json::to_string(&package_json)?;
+    let mut package_json_value = serde_json::to_value(&package_json)?;
+    if let serde_json::Value::Object(ref mut map) = package_json_value {
+        map.retain(|_, v| !v.is_null());
+    }
+    let package_json_str = serde_json::to_string(&package_json_value)?;
 
     // Write the JSON to a temporary package.json file
     let temp_file_path = Path::new("package.json");
