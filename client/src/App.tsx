@@ -22,14 +22,17 @@ function App() {
       const response = await fetch(`http://localhost:3030/outdated/${owner}/${repoName}`);
 
       if (!response.ok) {
+        setButtonDisabled(false);
         setResultsText('Error fetching repo');
         throw new Error(`Error: ${response.statusText}`);
       }
 
       const data = await response.json();
 
+      setButtonDisabled(false);
       setResultsText(JSON.parse(data))
     } catch (error) {
+      setButtonDisabled(false);
       console.error('Error fetching repo:', error);
       setResultsText('Error fetching repo');
     }
