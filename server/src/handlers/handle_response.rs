@@ -7,20 +7,6 @@ pub async fn process_success_response(response: reqwest::Response) -> Result<Pac
     println!("Package.json successfully fetched!");
     println!("{:?}", package_json);
 
-    if let Some(ref dependencies) = package_json.dependencies {
-        println!("Dependencies:");
-        for (name, version) in dependencies {
-            println!("{}: {}", name, version);
-        }
-    }
-
-    if let Some(ref dev_dependencies) = package_json.devDependencies {
-        println!("\nDev Dependencies:");
-        for (name, version) in dev_dependencies {
-            println!("{}: {}", name, version);
-        }
-    }
-
     Ok(package_json)
 }
 
