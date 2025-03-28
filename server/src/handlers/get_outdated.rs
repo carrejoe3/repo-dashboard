@@ -27,12 +27,15 @@ pub async fn run_npm_outdated(
     // Clean up the temporary file
     std::fs::remove_file(temp_file_path)?;
 
-    // Return the output
-    if output.status.success() {
-        let stdout = String::from_utf8(output.stdout)?;
-        Ok(stdout)
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+
+    // Handle the output
+    if output.status.success() || output.status.code() == Some(1) {
+        // Treat exit status 1 as a valid result (outdated dependencies found)
+        Ok(stdout.to_string())
     } else {
-        let stderr = String::from_utf8(output.stderr)?;
-        Err(stderr.into())
+        // Treat other non-zero exit codes as errors
+        Err(format!("npm outdated failed: {}", stderr).into())
     }
 }
