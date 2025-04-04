@@ -6,6 +6,7 @@ use handlers::requests::fetch_package_json;
 use handlers::requests::fetch_package_lock_json;
 use reqwest::Error;
 use warp::{Filter, Rejection, Reply, http::Method};
+use rand;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -30,7 +31,38 @@ async fn main() -> Result<(), Error> {
     let fetch_dep_tree_route =
         warp::path!("dep_tree" / String / String).and_then(|owner, repo| async move {
             match fetch_package_lock_json(owner, repo).await {
-                Ok(package_lock_json) => Ok(warp::reply::json(&package_lock_json)),
+                Ok(package_lock_json) => {
+                    // Transform package-lock data into the desired format
+                    let nodes: Vec<_> = package_lock_json
+                        .packages
+                        .keys()
+                        .enumerate()
+                        .map(|(id, _)| serde_json::json!({ "id": id }))
+                        .collect();
+
+                    let links: Vec<_> = package_lock_json
+                        .packages
+                        .keys()
+                        .enumerate()
+                        .filter_map(|(id, _)| {
+                            if id > 0 {
+                                Some(serde_json::json!({
+                                    "source": id,
+                                    "target": (rand::random::<usize>() % id)
+                                }))
+                            } else {
+                                None
+                            }
+                        })
+                        .collect();
+
+                    let tree = serde_json::json!({
+                        "nodes": nodes,
+                        "links": links
+                    });
+
+                    Ok(warp::reply::json(&tree))
+                }
                 Err(err) => Err(err),
             }
         });

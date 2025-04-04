@@ -3,7 +3,7 @@ import "./App.css";
 
 import ResultsTable from "./components/ResultsTable";
 import Button from "./components/Button";
-import ForceGraph3D from 'react-force-graph-3d';
+import ForceGraph3D from "react-force-graph-3d";
 
 import { useFetchOutdated } from "./hooks/useFetchOutdated";
 import { useFetchDepTree } from "./hooks/useFetchDepTree";
@@ -34,18 +34,6 @@ function App() {
   const handleFetchDepTree = () => {
     fetchDepTree(owner, repoName);
   };
-
-  const genRandomTree = (N = 300, reverse = false) => {
-    return {
-      nodes: [...Array(N).keys()].map(i => ({ id: i })),
-        links: [...Array(N).keys()]
-      .filter(id => id)
-      .map(id => ({
-        [reverse ? 'target' : 'source']: id,
-        [reverse ? 'source' : 'target']: Math.round(Math.random() * (id-1))
-      }))
-    };
-  }
 
   return (
     <div className="bg-gray-100 flex flex-col items-center p-4 w-full">
@@ -86,8 +74,7 @@ function App() {
       )}
       {fetchDepsError && <p className="text-red-500">{fetchDepsError}</p>}
       <ResultsTable resultsText={outdatedData} />
-      <div className="text-gray-800">{depsData}</div>
-      <ForceGraph3D graphData={genRandomTree()} />
+      {depsData && <ForceGraph3D graphData={depsData} />}
     </div>
   );
 }

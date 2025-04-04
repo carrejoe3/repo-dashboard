@@ -4,9 +4,7 @@ import { ResultsText } from "../types";
 export const useFetchOutdated = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<ResultsText>(
-    "Results will be shown here...",
-  );
+  const [data, setData] = useState<ResultsText>("");
 
   const fetchOutdated = async (owner: string, repoName: string) => {
     setLoading(true);
