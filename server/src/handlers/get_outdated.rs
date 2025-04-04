@@ -1,5 +1,6 @@
 use serde_json;
 use std::fs::File;
+use std::collections::HashMap;
 use std::io::Write;
 use std::path::Path;
 use tokio::process::Command;
@@ -41,7 +42,26 @@ pub async fn run_npm_outdated(
         if stdout.trim().is_empty() {
             Ok("All dependencies are up to date!".to_string())
         } else {
-            Ok(stdout.to_string())
+            let mut outdated_packages: serde_json::Value = serde_json::from_str(&stdout)?;
+            if let serde_json::Value::Object(ref mut map) = outdated_packages {
+                for (package, details) in map.iter_mut() {
+                    if let Some(current_version) = package_json
+                        .dependencies
+                        .as_ref()
+                        .unwrap_or(&HashMap::new())
+                        .get(package)
+                    {
+                        if let serde_json::Value::Object(details_map) = details {
+                            let details_map = details_map; // Make it mutable
+                            details_map.insert(
+                                "current".to_string(),
+                                serde_json::Value::String(current_version.clone()),
+                            );
+                        }
+                    }
+                }
+            }
+            Ok(outdated_packages.to_string())
         }
     } else {
         // Treat other non-zero exit codes as errors
