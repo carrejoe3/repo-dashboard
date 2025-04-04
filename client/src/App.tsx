@@ -12,6 +12,7 @@ function App() {
   const [resultsText, setResultsText] = useState<ResultsText>(
     "Results will be shown here...",
   );
+  const buttonsDisabled = buttonDisabled || owner === "" || repoName === "";
 
   const fetchRepoData = async (route: string) => {
     try {
@@ -66,13 +67,13 @@ function App() {
       <div className="w-full flex justify-center">
         <Button
           onClick={() => fetchRepoData("dep_tree")}
-          disabled={buttonDisabled || owner === "" || repoName === ""}
+          disabled={buttonsDisabled}
         >
           Check Outdated
         </Button>
         <Button
           onClick={() => fetchRepoData("dep_tree")}
-          disabled={buttonDisabled || owner === "" || repoName === ""}
+          disabled={buttonsDisabled}
         >
           Get Dependency Tree
         </Button>
