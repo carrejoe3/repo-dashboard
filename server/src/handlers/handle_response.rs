@@ -1,12 +1,24 @@
-use crate::handlers::types::PackageJson;
+use crate::handlers::types::{PackageJson, PackageLockJson};
 use reqwest::Error;
 
-pub async fn process_success_response(response: reqwest::Response) -> Result<PackageJson, Error> {
+pub async fn process_package_success_response(
+    response: reqwest::Response,
+) -> Result<PackageJson, Error> {
     let package_json: PackageJson = response.json().await?;
 
     println!("Package.json successfully fetched!");
 
     Ok(package_json)
+}
+
+pub async fn process_package_lock_success_response(
+    response: reqwest::Response,
+) -> Result<PackageLockJson, Error> {
+    let package_lock_json: PackageLockJson = response.json().await?;
+
+    println!("Package-lock.json successfully fetched!");
+
+    Ok(package_lock_json)
 }
 
 #[cfg(test)]
@@ -39,7 +51,7 @@ mod tests {
         }
         "#;
         let response = mock_response(body, StatusCode::OK);
-        let result = block_on(process_success_response(response));
+        let result = block_on(process_package_success_response(response));
         assert!(result.is_ok());
     }
 
@@ -52,7 +64,7 @@ mod tests {
         }
         "#;
         let response = mock_response(body, StatusCode::OK);
-        let result = block_on(process_success_response(response));
+        let result = block_on(process_package_success_response(response));
         assert!(result.is_ok());
     }
 
@@ -65,7 +77,7 @@ mod tests {
         }
         "#;
         let response = mock_response(body, StatusCode::OK);
-        let result = block_on(process_success_response(response));
+        let result = block_on(process_package_success_response(response));
         assert!(result.is_ok());
     }
 
@@ -78,7 +90,7 @@ mod tests {
         }
         "#;
         let response = mock_response(body, StatusCode::OK);
-        let result = block_on(process_success_response(response));
+        let result = block_on(process_package_success_response(response));
         assert!(result.is_err());
     }
 }

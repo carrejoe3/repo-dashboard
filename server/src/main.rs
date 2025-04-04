@@ -2,10 +2,10 @@ mod handlers;
 
 use handlers::errors::CustomError;
 use handlers::get_outdated::run_npm_outdated;
-use handlers::get_deps_tree::run_npm_ls;
 use handlers::requests::fetch_package_json;
+use handlers::requests::fetch_package_lock_json;
 use reqwest::Error;
-use warp::{http::Method, Filter, Rejection, Reply};
+use warp::{Filter, Rejection, Reply, http::Method};
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -29,13 +29,8 @@ async fn main() -> Result<(), Error> {
 
     let fetch_dep_tree_route =
         warp::path!("dep_tree" / String / String).and_then(|owner, repo| async move {
-            match fetch_package_json(owner, repo).await {
-                Ok(package_json) => match run_npm_ls(package_json).await {
-                    Ok(reply) => Ok(warp::reply::json(&reply)),
-                    Err(err) => Err(warp::reject::custom(CustomError {
-                        message: err.to_string(),
-                    })),
-                },
+            match fetch_package_lock_json(owner, repo).await {
+                Ok(package_lock_json) => Ok(warp::reply::json(&package_lock_json)),
                 Err(err) => Err(err),
             }
         });
@@ -46,9 +41,7 @@ async fn main() -> Result<(), Error> {
         .recover(handle_rejection) // Handle rejections
         .with(cors);
 
-    warp::serve(routes)
-        .run(([127, 0, 0, 1], 3030))
-        .await;
+    warp::serve(routes).run(([127, 0, 0, 1], 3030)).await;
 
     Ok(())
 }
