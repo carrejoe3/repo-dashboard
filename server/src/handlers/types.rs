@@ -31,20 +31,22 @@ pub struct PackageJson {
 pub struct PackageLockJson {
     name: Option<String>,
     version: Option<String>,
+    #[serde(rename = "lockfileVersion")]
     lockfile_version: Option<u32>,
     requires: Option<bool>,
-    dependencies: Option<HashMap<String, PackageLockDependency>>,
+    pub packages: HashMap<String, Package>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct PackageLockDependency {
-    version: Option<String>,
-    resolved: Option<String>,
-    integrity: Option<String>,
-    requires: Option<HashMap<String, String>>,
-    dependencies: Option<HashMap<String, PackageLockDependency>>,
-    dev: Option<bool>,
-    optional: Option<bool>,
-    bundled: Option<bool>,
-    peer: Option<bool>,
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Package {
+    pub name: Option<String>,
+    pub version: Option<String>,
+    pub dependencies: Option<HashMap<String, String>>,
+    #[serde(rename = "devDependencies")]
+    pub dev_dependencies: Option<HashMap<String, String>>,
+    pub resolved: Option<String>,
+    pub integrity: Option<String>,
+    pub dev: Option<bool>,
+    pub license: Option<String>,
+    pub engines: Option<HashMap<String, String>>,
 }
