@@ -37,7 +37,10 @@ async fn main() -> Result<(), Error> {
                         .packages
                         .keys()
                         .enumerate()
-                        .map(|(id, _)| serde_json::json!({ "id": id }))
+                        .map(|(id, package_name)| serde_json::json!({
+                            "id": id,
+                            "name": package_name
+                        }))
                         .collect();
 
                     let links: Vec<_> = package_lock_json
