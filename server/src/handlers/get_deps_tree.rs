@@ -36,7 +36,8 @@ pub async fn run_npm_ls(
     let stderr = String::from_utf8_lossy(&output.stderr);
 
     // Handle the output
-    if output.status.success() {
+    if output.status.success() || output.status.code() == Some(1) {
+      println!("stdout: {}", stdout);
       Ok(stdout.to_string())
     } else {
       Err(format!("npm ls failed: {}", stderr).into())
