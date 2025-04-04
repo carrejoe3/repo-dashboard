@@ -15,11 +15,10 @@ function App() {
   const [buttonDisabled, setButtonDisabled] = useState(false)
   const [resultsText, setResultsText] = useState<ResultsText>('Results will be shown here...')
 
-  const fetchRepoData = async () => {
+  const fetchRepoData = async (route: string) => {
     try {
       setButtonDisabled(true);
-
-      const response = await fetch(`http://localhost:3030/outdated/${owner}/${repoName}`);
+      const response = await fetch(`http://localhost:3030/${route}/${owner}/${repoName}`);
 
       if (!response.ok) {
         setButtonDisabled(false);
@@ -61,13 +60,23 @@ function App() {
           className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
         />
       </div>
-      <div className='p-3 pt-5 w-full'>
-        <button
-          onClick={() => fetchRepoData()}
-          className='shadow-sm'
-          disabled={buttonDisabled || owner === '' || repoName === ''}>
-          Search
-        </button>
+      <div className='w-full flex justify-center'>
+        <div className='p-3 pt-5'>
+          <button
+            onClick={() => fetchRepoData('outdated')}
+            className='shadow-sm'
+            disabled={buttonDisabled || owner === '' || repoName === ''}>
+            Check Outdated
+          </button>
+        </div>
+        <div className='p-3 pt-5'>
+          <button
+            onClick={() => fetchRepoData('dep_tree')}
+            className='shadow-sm'
+            disabled={buttonDisabled || owner === '' || repoName === ''}>
+            Get Dependency Tree
+          </button>
+        </div>
       </div>
       <div className='p-3 w-full text-gray-800'>
         {(typeof resultsText === 'object') ? (
