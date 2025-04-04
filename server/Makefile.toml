@@ -1,0 +1,4 @@
+[tasks.dev]
+description = "Run the server and watch for changes"
+command = "cargo"
+args = ["watch", "-x", "run"]
