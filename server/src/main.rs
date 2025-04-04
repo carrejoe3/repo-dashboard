@@ -2,9 +2,10 @@ mod handlers;
 
 use handlers::errors::CustomError;
 use handlers::get_outdated::run_npm_outdated;
+use handlers::get_deps_tree::run_npm_ls;
 use handlers::requests::fetch_package_json;
 use reqwest::Error;
-use warp::{http::Method, Filter};
+use warp::{http::Method, Filter, Rejection, Reply};
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -29,17 +30,20 @@ async fn main() -> Result<(), Error> {
     let fetch_dep_tree_route =
         warp::path!("dep_tree" / String / String).and_then(|owner, repo| async move {
             match fetch_package_json(owner, repo).await {
-                Ok(package_json) => {
-                    // Here you would call the function to get the dependency tree
-                    // For now, we just return the package_json for demonstration
-                    Ok(warp::reply::json(&package_json))
-                }
+                Ok(package_json) => match run_npm_ls(package_json).await {
+                    Ok(reply) => Ok(warp::reply::json(&reply)),
+                    Err(err) => Err(warp::reject::custom(CustomError {
+                        message: err.to_string(),
+                    })),
+                },
                 Err(err) => Err(err),
             }
         });
 
+    // Combine routes and apply CORS
     let routes = fetch_outdated_route
         .or(fetch_dep_tree_route)
+        .recover(handle_rejection) // Handle rejections
         .with(cors);
 
     warp::serve(routes)
@@ -47,4 +51,22 @@ async fn main() -> Result<(), Error> {
         .await;
 
     Ok(())
+}
+
+// Custom rejection handler to ensure CORS headers are included in error responses
+async fn handle_rejection(err: Rejection) -> Result<impl Reply, Rejection> {
+    if let Some(custom_error) = err.find::<CustomError>() {
+        let json = warp::reply::json(&serde_json::json!({
+            "error": custom_error.message
+        }));
+        let reply = warp::reply::with_status(json, warp::http::StatusCode::BAD_REQUEST);
+        return Ok(reply);
+    }
+
+    // Default to internal server error for unhandled rejections
+    let json = warp::reply::json(&serde_json::json!({
+        "error": "Internal Server Error"
+    }));
+    let reply = warp::reply::with_status(json, warp::http::StatusCode::INTERNAL_SERVER_ERROR);
+    Ok(reply)
 }
