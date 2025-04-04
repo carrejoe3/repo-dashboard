@@ -1,28 +1,27 @@
 import { useState } from "react";
-import { ResultsText } from "../types";
 
-export const useFetchOutdated = () => {
+export const useFetchDepTree = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<ResultsText>(
+  const [data, setData] = useState<string>(
     "Results will be shown here...",
   );
 
-  const fetchOutdated = async (owner: string, repoName: string) => {
+  const fetchDepTree = async (owner: string, repoName: string) => {
     setLoading(true);
     setError(null);
 
     try {
       const response = await fetch(
-        `http://localhost:3030/outdated/${owner}/${repoName}`,
+        `http://localhost:3030/dep_tree/${owner}/${repoName}`,
       );
 
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
 
-      const result = await response.json();
-      setData(JSON.parse(result));
+      const result = await response.text();
+      setData(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error fetching data");
     } finally {
@@ -30,5 +29,5 @@ export const useFetchOutdated = () => {
     }
   };
 
-  return { data, loading, error, fetchOutdated };
+  return { data, loading, error, fetchDepTree };
 };

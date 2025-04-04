@@ -4,37 +4,34 @@ import "./App.css";
 import ResultsTable from "./components/ResultsTable";
 import Button from "./components/Button";
 import { useFetchOutdated } from "./hooks/useFetchOutdated";
+import { useFetchDepTree } from "./hooks/useFetchDepTree";
 
 function App() {
   const [owner, setOwner] = useState("carrejoe3");
   const [repoName, setRepoName] = useState("wedding-site");
-  const { data: outdatedData, loading, error, fetchOutdated } = useFetchOutdated();
-  const buttonsDisabled = loading || !owner || !repoName;
+  const {
+    data: outdatedData,
+    loading: fetchOutdatedloading,
+    error: fetchOutdatederror,
+    fetchOutdated,
+  } = useFetchOutdated();
+  const {
+    data: depsData,
+    loading: fetchDepsLoading,
+    error: fetchDepsError,
+    fetchDepTree,
+  } = useFetchDepTree();
+
+  const buttonsDisabled =
+    fetchOutdatedloading || fetchDepsLoading || !owner || !repoName;
 
   const handleFetchOutdated = () => {
     fetchOutdated(owner, repoName);
   };
 
-  // const fetchDependencyTree = async () => {
-  //   try {
-  //     setButtonDisabled(true);
-  //     const response = await fetch(
-  //       `http://localhost:3030/dep_tree/${owner}/${repoName}`,
-  //     );
-  //     if (!response.ok) {
-  //       setButtonDisabled(false);
-  //       setResultsText("Error fetching repo");
-  //       throw new Error(`Error: ${response.statusText}`);
-  //     }
-  //     const data = await response.json();
-  //     setButtonDisabled(false);
-  //     setResultsText(data);
-  //   } catch (error) {
-  //     setButtonDisabled(false);
-  //     console.error("Error fetching repo:", error);
-  //     setResultsText("Error fetching repo");
-  //   }
-  // };
+  const handleFetchDepTree = () => {
+    fetchDepTree(owner, repoName);
+  };
 
   return (
     <div className="bg-gray-100 flex flex-col items-center p-4 w-full">
@@ -66,15 +63,16 @@ function App() {
         >
           Check Outdated
         </Button>
-        {/* <Button
-          onClick={() => fetchDependencyTree()}
-          disabled={buttonsDisabled}
-        >
+        <Button onClick={() => handleFetchDepTree()} disabled={buttonsDisabled}>
           Get Dependency Tree
-        </Button> */}
+        </Button>
       </div>
-      {error && <p className="text-red-500">{error}</p>}
+      {fetchOutdatederror && (
+        <p className="text-red-500">{fetchOutdatederror}</p>
+      )}
+      {fetchDepsError && <p className="text-red-500">{fetchDepsError}</p>}
       <ResultsTable resultsText={outdatedData} />
+      <div className="text-gray-800">{depsData}</div>
     </div>
   );
 }
