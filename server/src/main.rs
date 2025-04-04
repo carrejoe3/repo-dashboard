@@ -26,7 +26,21 @@ async fn main() -> Result<(), Error> {
             }
         });
 
-    let routes = fetch_outdated_route.with(cors);
+    let fetch_dep_tree_route =
+        warp::path!("dep_tree" / String / String).and_then(|owner, repo| async move {
+            match fetch_package_json(owner, repo).await {
+                Ok(package_json) => {
+                    // Here you would call the function to get the dependency tree
+                    // For now, we just return the package_json for demonstration
+                    Ok(warp::reply::json(&package_json))
+                }
+                Err(err) => Err(err),
+            }
+        });
+
+    let routes = fetch_outdated_route
+        .or(fetch_dep_tree_route)
+        .with(cors);
 
     warp::serve(routes)
         .run(([127, 0, 0, 1], 3030))
