@@ -3,43 +3,38 @@ import "./App.css";
 
 import ResultsTable from "./components/ResultsTable";
 import Button from "./components/Button";
-import { ResultsText } from "./types";
+import { useFetchOutdated } from "./hooks/useFetchOutdated";
 
 function App() {
   const [owner, setOwner] = useState("carrejoe3");
   const [repoName, setRepoName] = useState("wedding-site");
-  const [buttonDisabled, setButtonDisabled] = useState(false);
-  const [resultsText, setResultsText] = useState<ResultsText>(
-    "Results will be shown here...",
-  );
-  const buttonsDisabled = buttonDisabled || owner === "" || repoName === "";
+  const { data: outdatedData, loading, error, fetchOutdated } = useFetchOutdated();
+  const buttonsDisabled = loading || !owner || !repoName;
 
-  const fetchRepoData = async (route: string) => {
-    try {
-      setButtonDisabled(true);
-      const response = await fetch(
-        `http://localhost:3030/${route}/${owner}/${repoName}`,
-      );
-
-      if (!response.ok) {
-        setButtonDisabled(false);
-        setResultsText("Error fetching repo");
-        throw new Error(`Error: ${response.statusText}`);
-      }
-
-      console.log("Response:", response);
-      const data = await response.json();
-
-      console.log("Data:", data);
-
-      setButtonDisabled(false);
-      setResultsText(data);
-    } catch (error) {
-      setButtonDisabled(false);
-      console.error("Error fetching repo:", error);
-      setResultsText("Error fetching repo");
-    }
+  const handleFetchOutdated = () => {
+    fetchOutdated(owner, repoName);
   };
+
+  // const fetchDependencyTree = async () => {
+  //   try {
+  //     setButtonDisabled(true);
+  //     const response = await fetch(
+  //       `http://localhost:3030/dep_tree/${owner}/${repoName}`,
+  //     );
+  //     if (!response.ok) {
+  //       setButtonDisabled(false);
+  //       setResultsText("Error fetching repo");
+  //       throw new Error(`Error: ${response.statusText}`);
+  //     }
+  //     const data = await response.json();
+  //     setButtonDisabled(false);
+  //     setResultsText(data);
+  //   } catch (error) {
+  //     setButtonDisabled(false);
+  //     console.error("Error fetching repo:", error);
+  //     setResultsText("Error fetching repo");
+  //   }
+  // };
 
   return (
     <div className="bg-gray-100 flex flex-col items-center p-4 w-full">
@@ -66,19 +61,20 @@ function App() {
       </div>
       <div className="w-full flex justify-center">
         <Button
-          onClick={() => fetchRepoData("dep_tree")}
+          onClick={() => handleFetchOutdated()}
           disabled={buttonsDisabled}
         >
           Check Outdated
         </Button>
-        <Button
-          onClick={() => fetchRepoData("dep_tree")}
+        {/* <Button
+          onClick={() => fetchDependencyTree()}
           disabled={buttonsDisabled}
         >
           Get Dependency Tree
-        </Button>
+        </Button> */}
       </div>
-      <ResultsTable resultsText={resultsText} />
+      {error && <p className="text-red-500">{error}</p>}
+      <ResultsTable resultsText={outdatedData} />
     </div>
   );
 }
