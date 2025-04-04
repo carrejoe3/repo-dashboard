@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './App.css'
 
 import ResultsTable from './components/ResultsTable';
+import Button from './components/Button';
 import { ResultsText } from './types';
 
 function App() {
@@ -59,22 +60,12 @@ function App() {
         />
       </div>
       <div className='w-full flex justify-center'>
-        <div className='p-3 pt-5'>
-          <button
-            onClick={() => fetchRepoData('outdated')}
-            className='shadow-sm'
-            disabled={buttonDisabled || owner === '' || repoName === ''}>
-            Check Outdated
-          </button>
-        </div>
-        <div className='p-3 pt-5'>
-          <button
-            onClick={() => fetchRepoData('dep_tree')}
-            className='shadow-sm'
-            disabled={buttonDisabled || owner === '' || repoName === ''}>
-            Get Dependency Tree
-          </button>
-        </div>
+        <Button onClick={() => fetchRepoData('dep_tree')} disabled={buttonDisabled || owner === '' || repoName === ''}>
+          Check Outdated
+        </Button>
+        <Button onClick={() => fetchRepoData('dep_tree')} disabled={buttonDisabled || owner === '' || repoName === ''}>
+          Get Dependency Tree
+        </Button>
       </div>
       <ResultsTable resultsText={resultsText} />
     </div>
